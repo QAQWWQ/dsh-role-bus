@@ -19,14 +19,21 @@
 
 ## 安装
 
+这个包还没有发布到 npm，目前从源码安装。克隆后在 profile 目录里指向本地路径：
+
 ```bash
-npm install dsh-role-bus
+git clone https://github.com/QAQWWQ/dsh-role-bus.git
+cd <你的 profile 目录>        # 例如 ~/.dsh/profiles/desktop
+npm install /path/to/dsh-role-bus
 ```
+
+或者直接改 profile 的 `package.json`，把依赖写成
+`"dsh-role-bus": "link:/path/to/dsh-role-bus"`。
 
 然后在 profile 的 `dsh.profile.bundles` 里加上 `dsh-role-bus`。插件自带
 `cordis.patch.yml`，会把自己插入装配；角色配置默认是示例，需要按你的 preset 改。
 
-本地开发也可以用 `link:` 依赖直接指向插件目录。
+（发布到 npm 之后，`npm install dsh-role-bus` 可直接用。）
 
 ## 配置
 
