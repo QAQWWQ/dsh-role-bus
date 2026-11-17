@@ -37,6 +37,8 @@
             presets:
               - standard
               - studio
+              # 创造模式（cordis）带插件管理工具，动手改东西，归入实现会话。
+              - cordis
             denyTools: []
             writeAllow: []
             writeDeny: []

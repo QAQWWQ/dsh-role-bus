@@ -2,3 +2,4 @@ node_modules/
 .dsh/
 _tmp/
 *.bak
+_diag.log

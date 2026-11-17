@@ -14,6 +14,9 @@
   放行。
 - **状态戳**：工单带上状态文件的短哈希，收件方能看出「这条工单是基于旧版本提的」。
 
+这是一个个人实验，定位是「异步交接 + 按角色的边界」。它不追求实时协作，也不会
+主动唤醒对方会话；方案对比、关键取舍和未做的事见 [DESIGN.md](DESIGN.md)。
+
 ## 安装
 
 ```bash
@@ -48,7 +51,7 @@ npm install dsh-role-bus
             writeDeny: [memory/project-state.md]
           implementer:
             label: 实现会话
-            presets: [standard, studio]
+            presets: [standard, studio, cordis]
             denyTools: []
             writeAllow: []
             writeDeny: []

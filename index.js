@@ -50,6 +50,10 @@ const OPS_READ_ALLOW = new Set([
 
 const PROMPT_ORDER = 500
 
+// resume 时 Agent 可能先挂到基础组合，随后才 rebind 到会话记录的 preset；
+// 空 preset 和「preset 还没落到角色上」共用这一份重试预算。
+const MAX_ATTACH_ATTEMPTS = 6
+
 // 启发式写工具：名字里出现写动词 + 参数里带路径，两个条件都满足才当写工具。
 // 这样 create_plan / update_goal 这类没有路径参数的规划工具不会被误拦。
 const WRITE_VERBS = new Set([
@@ -548,27 +552,33 @@ export function apply(ctx, config) {
     } catch {
       preset = ''
     }
-    if (!preset) {
-      // preset 组装可能晚于 created 事件；有限次重试，避免把自己钉死在时序上。
-      if (attempt < 4) {
+    const role = resolveRole(preset)
+    if (!role) {
+      // 两种可能：preset 还没组装完（空串），或 resume 时先挂基础组合、
+      // 稍后才 rebind 到会话记录里的 preset。有限次重试等它稳定。
+      if (attempt < MAX_ATTACH_ATTEMPTS) {
         const retry = setTimeout(() => {
           void attach(agent, attempt + 1, signal)
-        }, 50 * attempt)
+        }, Math.min(250 * attempt, 1000))
         retry.unref?.()
+      } else {
+        warn(`会话 ${agent.id} 的 preset=${preset || '(空)'} 不属于任何角色，跳过绑定`)
       }
       return
     }
-    const role = resolveRole(preset)
-    if (!role) return
 
-    if (!caps.cwd) {
-      warn('workingDirectory.ensure 不可用，拿不到工作目录，跳过角色绑定（写白名单需要可靠的 cwd）')
-      return
+    // workingDirectory 是 Agent 级服务：插件根 ctx 上探测不到（caps.cwd=false），
+    // 要等 created 之后从 agent.ctx 取。
+    let wd
+    try {
+      wd = (typeof agent.ctx?.get === 'function' ? agent.ctx.get('workingDirectory') : undefined)
+        ?? ctx.get('workingDirectory')
+    } catch {
+      wd = undefined
     }
-
     let cwd = ''
     try {
-      cwd = (await ctx.get('workingDirectory')?.ensure?.(agent, signal)) ?? ''
+      cwd = (await wd?.ensure?.(agent, signal)) ?? ''
     } catch (error) {
       warn(`拿不到工作目录（${agent.id}）：${error?.message ?? error}`)
       cwd = ''
