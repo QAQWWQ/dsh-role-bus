@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Role Bus",
+    "description": "Cross-session work-order mailbox and role boundaries for a designer/implementer session pair."
+  }
+}

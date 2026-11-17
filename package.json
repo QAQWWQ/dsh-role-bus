@@ -1,0 +1,68 @@
+{
+  "name": "dsh-role-bus",
+  "version": "0.1.0",
+  "description": "跨会话工单邮箱与角色边界：把一个会话里的「设计」和另一个会话里的「实现」绑成一对，用 .dsh/mail 落盘的工单交接，并按 preset 限制各自能碰的工具和文件。",
+  "icon": "icon.svg",
+  "license": "MIT",
+  "author": "EternalNight996",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./index.js": "./index.js",
+    "./compat.js": "./compat.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "compat.js",
+    "cordis.patch.yml",
+    "locale",
+    "icon.svg",
+    "selftest.mjs",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "test": "node selftest.mjs"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "role",
+    "role-bus",
+    "multi-agent",
+    "mailbox",
+    "work-order",
+    "permissions",
+    "guard"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "marketplace": {
+      "profiles": [
+        "web",
+        "desktop"
+      ],
+      "requiresBuildApproval": false,
+      "requiresRestart": true,
+      "manualSteps": false
+    },
+    "permissions": {
+      "level": "medium",
+      "files": "read-write",
+      "network": "none",
+      "commands": "none",
+      "credentials": [],
+      "externalServices": [],
+      "notes": "Reads and appends project-local .dsh/mail/*.jsonl. Does not edit project files itself: it only guards which tools and write paths each session may use."
+    }
+  }
+}

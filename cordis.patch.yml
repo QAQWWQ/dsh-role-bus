@@ -1,0 +1,42 @@
+# role-bus 的默认装配：只插入插件本身，配置是一份可直接改的示例。
+#
+# 用法：把 roles 下的 presets 改成你自己会话用的 preset id。角色由 preset id
+# 决定，一个 preset 只能属于一个角色；没命中的会话不受影响。
+#
+# 注意：config 是整块替换的。在 profile 的 cordis.patch.yml 里覆盖时要把这里
+# 的字段写全，不要只写 delta，否则未写的字段会退回代码默认值。
+#
+# 改完配置需要新开会话才完全生效（角色在会话创建时绑定）。
+
+- insert:
+    - id: role-bus
+      name: dsh-role-bus
+      config:
+        mailDir: .dsh/mail
+        refreshMs: 1000
+        maxInject: 8
+        # 状态文件用来给工单打版本戳；没有就留空。
+        stateFiles: []
+        roles:
+          designer:
+            label: 设计会话
+            presets:
+              - design
+            # 设计角色不碰 shell：代码改动交给实现角色。
+            denyTools:
+              - ops_bash
+              - ops_pwsh
+            # 相对于会话工作目录。写目录即递归允许；写单个文件即只允许该文件。
+            writeAllow:
+              - README.md
+              - design
+            # 拒绝优先，可以把白名单里的一部分挖出去。
+            writeDeny: []
+          implementer:
+            label: 实现会话
+            presets:
+              - standard
+              - studio
+            denyTools: []
+            writeAllow: []
+            writeDeny: []
